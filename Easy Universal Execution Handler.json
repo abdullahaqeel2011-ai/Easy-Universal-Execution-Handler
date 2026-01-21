@@ -1,0 +1,202 @@
+{
+  "name": "Easy Universal Execution Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "aa7a41f5-a83f-4fc9-8807-c1a52ee7604b",
+      "name": "Click to Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "workflow_name",
+              "value": "Random Fact to Slack",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "description",
+              "value": "Fetches random facts and shares engaging versions on Slack",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "36c1b458-de24-48d1-88c1-d8d297ee7427",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2656,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://uselessfacts.jsph.pl/random.json?language=en",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "dcf2dd30-f053-4463-acfb-c7ea7f1b8651",
+      "name": "Get Random Fact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2880,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "lunabutler166@gmail.com",
+        "subject": "=🎯 Fun Fact of the Day!",
+        "message": "={{ $('Make It Engaging').item.json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3456,
+        160
+      ],
+      "id": "df6910b0-6a60-46ab-99d5-c06baa1f5e25",
+      "name": "Send a message",
+      "webhookId": "135bec24-264b-4714-8fd5-7bc2d83ca618",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VLKjREyJg5gll9uA",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "af795b86-d103-40ce-ab9f-32cd8525ff50",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3184,
+        384
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "7bKceJuVB7U9po42",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={ 'Here is a random fact to make more engaging: ' + $json.text }",
+        "options": {
+          "systemMessage": "You are a creative content writer who transforms dry facts into engaging, fun content. Always add a relevant emoji at the start and keep responses concise (2-3 sentences max)."
+        }
+      },
+      "id": "65c473fd-23ab-4208-b1d8-a1b10410147d",
+      "name": "Make It Engaging",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3104,
+        160
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Click to Start": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Get Random Fact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Random Fact": {
+      "main": [
+        [
+          {
+            "node": "Make It Engaging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Make It Engaging",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make It Engaging": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "cd713742-0255-4ec0-b312-c73c4898891e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "31c604b343648f40010fc68a11f2ec89765f6cc440024c4c9a6e3460925350f4"
+  },
+  "id": "ThNz1jSKj2duAEp-I-bSq",
+  "tags": []
+}
